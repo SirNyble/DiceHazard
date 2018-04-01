@@ -1,19 +1,15 @@
 package com.example.thomas.dicehazard
 
-import java.nio.FloatBuffer
-import java.nio.ByteOrder.nativeOrder
-import android.R.attr.order
-import java.nio.ByteBuffer
-import java.nio.ByteBuffer.allocateDirect
-import java.nio.ByteOrder
 import android.opengl.GLES20
-
-
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.FloatBuffer
 
 
 class Triangle {
     //Vertex Shader
-    private val vertexShaderCode = ("attribute vec4 vPosition;" +
+    private val vertexShaderCode = (
+        "attribute vec4 vPosition;" +
         "void main() {" +
         "  gl_Position = vPosition;" +
         "}")
@@ -26,6 +22,7 @@ class Triangle {
         "  gl_FragColor = vColor;" +
         "}")
 
+    //Shader variable handles
     private var mPositionHandle: Int = -1
     private var mColorHandle: Int = -1
 
@@ -83,13 +80,13 @@ class Triangle {
 
     fun draw() {
         // Add program to OpenGL ES environment
-        GLES20.glUseProgram(mProgram);
+        GLES20.glUseProgram(mProgram)
 
         // get handle to vertex shader's vPosition member
-        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
+        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition")
 
         // Enable a handle to the triangle vertices
-        GLES20.glEnableVertexAttribArray(mPositionHandle);
+        GLES20.glEnableVertexAttribArray(mPositionHandle)
 
         // Prepare the triangle coordinate data
         GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX,
@@ -97,15 +94,15 @@ class Triangle {
                 vertexStride, vertexBuffer);
 
         // get handle to fragment shader's vColor member
-        mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
+        mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor")
 
         // Set color for drawing the triangle
-        GLES20.glUniform4fv(mColorHandle, 1, color, 0);
+        GLES20.glUniform4fv(mColorHandle, 1, color, 0)
 
         // Draw the triangle
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount)
 
         // Disable vertex array
-        GLES20.glDisableVertexAttribArray(mPositionHandle);
+        GLES20.glDisableVertexAttribArray(mPositionHandle)
     }
 }

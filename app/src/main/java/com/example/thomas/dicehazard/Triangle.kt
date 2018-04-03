@@ -99,7 +99,7 @@ class Triangle {
         // Prepare the triangle coordinate data
         GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX,
                 GLES20.GL_FLOAT, false,
-                vertexStride, vertexBuffer);
+                vertexStride, vertexBuffer)
 
         // get handle to fragment shader's vColor member
         mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor")

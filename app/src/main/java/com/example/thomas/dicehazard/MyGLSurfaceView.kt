@@ -12,7 +12,7 @@ internal class MyGLSurfaceView(context: Context) : GLSurfaceView(context) {
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2)
 
-        mRenderer = MyGLRenderer()
+        mRenderer = MyGLRenderer(context)
 
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(mRenderer)

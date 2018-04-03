@@ -6,22 +6,31 @@ import javax.microedition.khronos.opengles.GL10
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
 import android.opengl.Matrix.frustumM
+import android.content.Context
 
 
+class MyGLRenderer(context: Context) : GLSurfaceView.Renderer {
 
-
-class MyGLRenderer : GLSurfaceView.Renderer {
+    private var mContext: Context? = null
     private var mTriangle: Triangle? = null
+    private var mModel: Model? = null
 
     // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
     private val mMVPMatrix = FloatArray(16)
     private val mProjectionMatrix = FloatArray(16)
     private val mViewMatrix = FloatArray(16)
 
+    init {
+        mContext = context
+    }
+
     override fun onSurfaceCreated(gl: GL10?, config: javax.microedition.khronos.egl.EGLConfig?) {
         GLES20.glClearColor(0.5f, 0.0f, 0.0f, 1.0f)
 
         mTriangle = Triangle()
+
+        val inputStream = mContext?.assets?.open("astroBoy_walk_Max.dae")
+        mModel = Model(inputStream!!)
     }
 
     override fun onDrawFrame(unused: GL10) {

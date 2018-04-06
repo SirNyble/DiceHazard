@@ -1,25 +1,60 @@
 package com.example.thomas.dicehazard
 
+import android.util.Log
 import org.xmlpull.v1.XmlPullParser
 import android.util.Xml
+import org.w3c.dom.Element
+import org.w3c.dom.Node
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.io.InputStream
+import java.lang.reflect.Array.getLength
+import javax.xml.parsers.DocumentBuilderFactory
 
 
 class ColladaReader {
 
     @Throws(XmlPullParserException::class, IOException::class)
     fun parse(inputStream: InputStream): List<*> {
+        var entries: MutableList<Mesh> = emptyList<Mesh>().toMutableList()
         try {
-            val parser = Xml.newPullParser()
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
-            parser.setInput(inputStream, null)
-            parser.nextTag()
-            return readFeed(parser)
-        } finally {
-            inputStream.close()
+            Log.d("Greetings", "HELLO")
+            val dbFactory = DocumentBuilderFactory.newInstance()
+            val dBuilder = dbFactory.newDocumentBuilder()
+            val doc = dBuilder.parse(inputStream)
+
+            val element = doc.documentElement
+            element.normalize()
+
+            val meshElement = doc.getElementsByTagName("mesh").item(0)
+
+            val length = meshElement.childNodes.length
+            for (i in 0 until length) {
+
+                val node = meshElement.childNodes.item(i)
+                if (node.nodeType.equals(Node.ELEMENT_NODE) ) {
+                    val sourceElement = node as Element
+                    Log.d("Collada element name: ",  sourceElement.tagName)
+                    Log.d("Collada element i", i.toString())
+                    when (sourceElement.tagName) {
+                        "source" -> {
+                            Log.d("Collada file element","SOURCE WOO")
+                        }
+                        "triangles" -> {
+                            Log.d("Collada file element","TRIANGLES")
+                        }
+                        "vertices" -> {
+                            Log.d("Collada file element","Vertices: This is where we find out the float bufer source id")
+                        }
+                    }
+                }
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
+
+        return entries
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
@@ -37,6 +72,8 @@ class ColladaReader {
             val name = parser.name
             // Starts by looking for the entry tag
             if (name == "library_geometries") {
+
+                next = parser.next()
                 entries.add(readMesh(parser))
             } else {
                 skip(parser)

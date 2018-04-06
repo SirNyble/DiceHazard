@@ -42,8 +42,7 @@ class ColladaReader {
             }
             "vertices" -> {
               Log.d("Collada file element", "Vertices")
-              val inputEle = sourceElement.firstChild as Element
-              mesh.positionSourceID = inputEle.getAttribute("source")
+              mesh.setPositionSourceID(sourceElement)
             }
             "triangles" -> {
               Log.d("Collada file element", "TRIANGLES")

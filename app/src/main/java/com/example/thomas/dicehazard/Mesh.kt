@@ -6,25 +6,25 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 class Mesh {
-    var buffers = HashMap<String, FloatArray>()
-    var triangleBuffers: MutableList<Int> = arrayListOf()
-    var positionSourceID: String? = null
+  var buffers = HashMap<String, FloatArray>()
+  var triangleBuffers: MutableList<Int> = arrayListOf()
+  var positionSourceID: String? = null
 
-    init {
+  init {
 
-    }
+  }
 
-    fun addBufferFromSource(sourceElement: Element) {
+  fun addBufferFromSource(sourceElement: Element) {
 
-    }
+  }
 
-    fun addTriangleBuffersFromSource(sourceElement: Element) {
+  fun addTriangleBuffersFromSource(sourceElement: Element) {
 
-    }
+  }
 
-    fun updateGLBuffers() {
-        //TODO: use appropriate opengl calls to fill the buffers
-        // initialize vertex byte buffer for shape coordinates
+  fun updateGLBuffers() {
+    //TODO: use appropriate opengl calls to fill the buffers
+    // initialize vertex byte buffer for shape coordinates
 //        val bb = ByteBuffer.allocateDirect(
 //                // (number of coordinate values * 4 bytes per float)
 //                triangleCoords.size * 4)
@@ -54,5 +54,5 @@ class Mesh {
 //
 //        // creates OpenGL ES program executables
 //        GLES20.glLinkProgram(mProgram)
-    }
+  }
 }

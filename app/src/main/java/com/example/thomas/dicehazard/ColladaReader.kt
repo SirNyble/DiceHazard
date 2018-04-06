@@ -12,115 +12,115 @@ import javax.xml.parsers.DocumentBuilderFactory
 
 class ColladaReader {
 
-    @Throws(XmlPullParserException::class, IOException::class)
-    fun parse(inputStream: InputStream): List<*> {
-        var entries: MutableList<Mesh> = emptyList<Mesh>().toMutableList()
-        try {
-            Log.d("Greetings", "HELLO")
-            val dbFactory = DocumentBuilderFactory.newInstance()
-            val dBuilder = dbFactory.newDocumentBuilder()
-            val doc = dBuilder.parse(inputStream)
+  @Throws(XmlPullParserException::class, IOException::class)
+  fun parse(inputStream: InputStream): List<*> {
+    var entries: MutableList<Mesh> = emptyList<Mesh>().toMutableList()
+    try {
+      Log.d("Greetings", "HELLO")
+      val dbFactory = DocumentBuilderFactory.newInstance()
+      val dBuilder = dbFactory.newDocumentBuilder()
+      val doc = dBuilder.parse(inputStream)
 
-            val element = doc.documentElement
-            element.normalize()
+      val element = doc.documentElement
+      element.normalize()
 
-            val meshElement = doc.getElementsByTagName("mesh").item(0)
+      val meshElement = doc.getElementsByTagName("mesh").item(0)
 
-            val length = meshElement.childNodes.length
-            var mesh: Mesh = Mesh()
-            for (i in 0 until length) {
-                val node = meshElement.childNodes.item(i)
-                if (node.nodeType.equals(Node.ELEMENT_NODE) ) {
-                    val sourceElement = node as Element
-                    Log.d("Collada element name: ",  sourceElement.tagName)
-                    Log.d("Collada element i", i.toString())
-                    when (sourceElement.tagName) {
-                        "source" -> {
-                            Log.d("Collada file element","SOURCE WOO")
-                            Log.d("Collada Source Element", sourceElement.getAttribute("id"))
-                            mesh.addBufferFromSource(sourceElement)
-                        }
-                        "vertices" -> {
-                            Log.d("Collada file element", "Vertices")
-                            val inputEle = sourceElement.firstChild as Element
-                            mesh.positionSourceID = inputEle.getAttribute("source")
-                        }
-                        "triangles" -> {
-                            Log.d("Collada file element","TRIANGLES")
-                            mesh.addTriangleBuffersFromSource(sourceElement)
-                        }
-                    }
-                }
+      val length = meshElement.childNodes.length
+      var mesh: Mesh = Mesh()
+      for (i in 0 until length) {
+        val node = meshElement.childNodes.item(i)
+        if (node.nodeType.equals(Node.ELEMENT_NODE)) {
+          val sourceElement = node as Element
+          Log.d("Collada element name: ", sourceElement.tagName)
+          Log.d("Collada element i", i.toString())
+          when (sourceElement.tagName) {
+            "source" -> {
+              Log.d("Collada file element", "SOURCE WOO")
+              Log.d("Collada Source Element", sourceElement.getAttribute("id"))
+              mesh.addBufferFromSource(sourceElement)
             }
-            //mesh now has buffers so now we construct the VBO
-            mesh.updateGLBuffers()
-
-        } catch (e: Exception) {
-            e.printStackTrace()
+            "vertices" -> {
+              Log.d("Collada file element", "Vertices")
+              val inputEle = sourceElement.firstChild as Element
+              mesh.positionSourceID = inputEle.getAttribute("source")
+            }
+            "triangles" -> {
+              Log.d("Collada file element", "TRIANGLES")
+              mesh.addTriangleBuffersFromSource(sourceElement)
+            }
+          }
         }
+      }
+      //mesh now has buffers so now we construct the VBO
+      mesh.updateGLBuffers()
 
-        return entries
+    } catch (e: Exception) {
+      e.printStackTrace()
     }
 
-    @Throws(XmlPullParserException::class, IOException::class)
-    private fun readFeed(parser: XmlPullParser): List<*> {
-        var entries: MutableList<Mesh> = emptyList<Mesh>().toMutableList()
+    return entries
+  }
 
-        //parser.require(XmlPullParser.START_TAG, null, "feed")
-        var next = parser.next()
-        while (next != XmlPullParser.END_TAG) {
-            if (parser.eventType != XmlPullParser.START_TAG) {
-                next = parser.next()
-                continue
+  @Throws(XmlPullParserException::class, IOException::class)
+  private fun readFeed(parser: XmlPullParser): List<*> {
+    var entries: MutableList<Mesh> = emptyList<Mesh>().toMutableList()
 
-            }
-            val name = parser.name
-            // Starts by looking for the entry tag
-            if (name == "library_geometries") {
+    //parser.require(XmlPullParser.START_TAG, null, "feed")
+    var next = parser.next()
+    while (next != XmlPullParser.END_TAG) {
+      if (parser.eventType != XmlPullParser.START_TAG) {
+        next = parser.next()
+        continue
 
-                next = parser.next()
-                entries.add(readMesh(parser))
-            } else {
-                skip(parser)
-            }
-            next = parser.next()
-        }
-        return entries
+      }
+      val name = parser.name
+      // Starts by looking for the entry tag
+      if (name == "library_geometries") {
+
+        next = parser.next()
+        entries.add(readMesh(parser))
+      } else {
+        skip(parser)
+      }
+      next = parser.next()
     }
+    return entries
+  }
 
-    // Parses the contents of an entry. If it encounters a title, summary, or link tag, hands them off
-    // to their respective "read" methods for processing. Otherwise, skips the tag.
-    @Throws(XmlPullParserException::class, IOException::class)
-    private fun readMesh(parser: XmlPullParser): Mesh {
-        //parser.require(XmlPullParser.START_TAG, null, "entry")
-        var title: String? = null
-        var summary: String? = null
-        var link: String? = null
-        while (parser.next() != XmlPullParser.END_TAG) {
-            if (parser.eventType != XmlPullParser.START_TAG) {
-                continue
-            }
-            val name = parser.name
-            if (name == "title") {
-                val to = true
-            }
-        }
-        val mesh = Mesh()
-        return mesh
+  // Parses the contents of an entry. If it encounters a title, summary, or link tag, hands them off
+  // to their respective "read" methods for processing. Otherwise, skips the tag.
+  @Throws(XmlPullParserException::class, IOException::class)
+  private fun readMesh(parser: XmlPullParser): Mesh {
+    //parser.require(XmlPullParser.START_TAG, null, "entry")
+    var title: String? = null
+    var summary: String? = null
+    var link: String? = null
+    while (parser.next() != XmlPullParser.END_TAG) {
+      if (parser.eventType != XmlPullParser.START_TAG) {
+        continue
+      }
+      val name = parser.name
+      if (name == "title") {
+        val to = true
+      }
     }
+    val mesh = Mesh()
+    return mesh
+  }
 
-    @Throws(XmlPullParserException::class, IOException::class)
-    private fun skip(parser: XmlPullParser) {
-        if (parser.eventType != XmlPullParser.START_TAG) {
-            throw IllegalStateException()
-        }
-        var depth = 1
-        while (depth != 0) {
-            when (parser.next()) {
-                XmlPullParser.END_TAG -> depth--
-                XmlPullParser.START_TAG -> depth++
-            }
-        }
+  @Throws(XmlPullParserException::class, IOException::class)
+  private fun skip(parser: XmlPullParser) {
+    if (parser.eventType != XmlPullParser.START_TAG) {
+      throw IllegalStateException()
     }
+    var depth = 1
+    while (depth != 0) {
+      when (parser.next()) {
+        XmlPullParser.END_TAG -> depth--
+        XmlPullParser.START_TAG -> depth++
+      }
+    }
+  }
 
 }

@@ -8,13 +8,13 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 class Model(inputStream: InputStream) {
-    private var mMeshes: MutableList<Mesh> = emptyList<Mesh>().toMutableList()
+  private var mMeshes: MutableList<Mesh> = emptyList<Mesh>().toMutableList()
 
-    init {
+  init {
 
-        val colladaReader = ColladaReader()
-        colladaReader.parse(inputStream)
-        // initialize vertex byte buffer for shape coordinates
+    val colladaReader = ColladaReader()
+    colladaReader.parse(inputStream)
+    // initialize vertex byte buffer for shape coordinates
 //        val bb = ByteBuffer.allocateDirect(
 //                // (number of coordinate values * 4 bytes per float)
 //                triangleCoords.size * 4)
@@ -44,7 +44,7 @@ class Model(inputStream: InputStream) {
 //
 //        // creates OpenGL ES program executables
 //        GLES20.glLinkProgram(mProgram)
-    }
+  }
 
 
 }

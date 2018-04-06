@@ -1,14 +1,12 @@
 package com.example.thomas.dicehazard
 
 import android.util.Log
-import org.xmlpull.v1.XmlPullParser
-import android.util.Xml
 import org.w3c.dom.Element
 import org.w3c.dom.Node
+import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.io.InputStream
-import java.lang.reflect.Array.getLength
 import javax.xml.parsers.DocumentBuilderFactory
 
 
@@ -29,8 +27,8 @@ class ColladaReader {
             val meshElement = doc.getElementsByTagName("mesh").item(0)
 
             val length = meshElement.childNodes.length
+            var mesh: Mesh = Mesh()
             for (i in 0 until length) {
-
                 val node = meshElement.childNodes.item(i)
                 if (node.nodeType.equals(Node.ELEMENT_NODE) ) {
                     val sourceElement = node as Element
@@ -39,16 +37,23 @@ class ColladaReader {
                     when (sourceElement.tagName) {
                         "source" -> {
                             Log.d("Collada file element","SOURCE WOO")
+                            Log.d("Collada Source Element", sourceElement.getAttribute("id"))
+                            mesh.addBufferFromSource(sourceElement)
+                        }
+                        "vertices" -> {
+                            Log.d("Collada file element", "Vertices")
+                            val inputEle = sourceElement.firstChild as Element
+                            mesh.positionSourceID = inputEle.getAttribute("source")
                         }
                         "triangles" -> {
                             Log.d("Collada file element","TRIANGLES")
-                        }
-                        "vertices" -> {
-                            Log.d("Collada file element","Vertices: This is where we find out the float bufer source id")
+                            mesh.addTriangleBuffersFromSource(sourceElement)
                         }
                     }
                 }
             }
+            //mesh now has buffers so now we construct the VBO
+            mesh.updateGLBuffers()
 
         } catch (e: Exception) {
             e.printStackTrace()

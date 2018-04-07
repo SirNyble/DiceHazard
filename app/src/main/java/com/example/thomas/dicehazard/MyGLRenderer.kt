@@ -1,12 +1,10 @@
 package com.example.thomas.dicehazard
 
-import android.opengl.EGLConfig
+import android.content.Context
 import android.opengl.GLES20
-import javax.microedition.khronos.opengles.GL10
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
-import android.opengl.Matrix.frustumM
-import android.content.Context
+import javax.microedition.khronos.opengles.GL10
 
 
 class MyGLRenderer(context: Context) : GLSurfaceView.Renderer {

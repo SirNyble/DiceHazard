@@ -58,17 +58,14 @@ class Mesh {
   private var mModelMatrixHandle: Int = -1
   private val mModelMatrix: FloatArray = FloatArray(16)
 
-
   var triangleCoords: FloatArray? = null
 
-  init {
-
-  }
+  init { }
 
   fun addBufferFromSource(sourceElement: Element) {
     for (i in 0 until sourceElement.childNodes.length) {
       val node = sourceElement.childNodes.item(i)
-      if (node.nodeType.equals(Node.ELEMENT_NODE)) {
+      if (node.nodeType == Node.ELEMENT_NODE) {
         val childElement = node as Element
         when (childElement.tagName) {
           "float_array" -> {
@@ -90,7 +87,7 @@ class Mesh {
 
     for (i in 0 until sourceElement.childNodes.length) {
       val node = sourceElement.childNodes.item(i)
-      if (node.nodeType.equals(Node.ELEMENT_NODE)) {
+      if (node.nodeType == Node.ELEMENT_NODE) {
         val childElement = node as Element
         when (childElement.tagName) {
           "p" -> {
@@ -115,10 +112,8 @@ class Mesh {
   fun update() {
     //First we need to update the number of vertices
     updateVertexCount()
-
     //Now that we have the vertex count we can fill the triangle float array
     updateTriangleCoords()
-
     //Update GL Buffers with the updated triangl float array
     updateGLBuffers()
   }
@@ -140,7 +135,7 @@ class Mesh {
     //triangleBuffers contains the INDEX of the position in the floatbuffer buffers var
     //each triangle has 3 elements (XYZ), Normal, Texture so we step by 3 to only get XYZ for now
     //TODO: Get and fill the Normal and Texture
-    var buffer: FloatArray = buffers[positionSourceID]!!
+    val buffer: FloatArray = buffers[positionSourceID]!!
     var currentTriangle = 0
     for (i in 0 until triangleBuffers.size) {
       for (j in 0 until triangleBuffers[i].size step 3) {
@@ -229,11 +224,11 @@ class Mesh {
   }
 
   private fun getFloatArrayFromString(floatArrString: String, count: Int): FloatArray {
-    var floatArr: FloatArray = FloatArray(count)
+    val floatArr = FloatArray(count)
 
-    var tokenizedStr = floatArrString.split(" ")
+    val tokenizedStr = floatArrString.split(" ")
     val strCount = tokenizedStr.count()
-    if (strCount.equals(count)) {
+    if (strCount == count) {
       for (i in 0 until count) {
         floatArr[i] = tokenizedStr[i].toFloat()
       }
@@ -246,12 +241,12 @@ class Mesh {
 
   private fun getIntArrayFromString(bufferString: String, count: Int): IntArray {
     val trianglesToElements: Int = count * buffers.count() * 3
-    var intArray = IntArray(trianglesToElements)
+    val intArray = IntArray(trianglesToElements)
 
-    var tokenizedStr = bufferString.split(" ")
+    val tokenizedStr = bufferString.split(" ")
     val strCount = tokenizedStr.count()
 
-    if (strCount.equals(trianglesToElements)) {
+    if (strCount == trianglesToElements) {
       for (i in 0 until strCount) {
         intArray[i] = tokenizedStr[i].toInt()
       }

@@ -53,7 +53,7 @@ class ColladaReader {
       }
       //mesh now has buffers so now we construct the VBO
       mesh.updateGLBuffers()
-
+      entries.add(mesh)
     } catch (e: Exception) {
       e.printStackTrace()
     }

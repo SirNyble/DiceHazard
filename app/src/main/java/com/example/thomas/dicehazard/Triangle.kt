@@ -42,16 +42,19 @@ class Triangle {
   private val COORDS_PER_VERTEX: Int = 3
   private val triangleCoords: FloatArray = floatArrayOf(
       // in counterclockwise order:
-      0.0f, 0.622008459f, 0.0f, // top
-      -0.5f, -0.311004243f, 0.0f, // bottom left
-      0.5f, -0.311004243f, 0.0f  // bottom right
+      1.235668f, 0.496339f, 0.455921f,
+      1.455921f, 3.04533f, 0.235668f,
+      1.424213f, 0.506279f, 0.455921f
+//      0.0f, 0.622008459f, 0.0f, // top
+//      -0.5f, -0.311004243f, 0.0f, // bottom left
+//      0.5f, -0.311004243f, 0.0f  // bottom right
   )
 
   private val vertexCount = triangleCoords.size / COORDS_PER_VERTEX
   private val vertexStride = COORDS_PER_VERTEX * 4 // 4 bytes per vertex
 
   //Color
-  private val color: FloatArray = floatArrayOf(0.63671875f, 0.76953125f, 0.22265625f, 1.0f)
+  private val color: FloatArray = floatArrayOf(0.0f, 0.76953125f, 0.1f, 1.0f)
 
   init {
     // initialize vertex byte buffer for shape coordinates

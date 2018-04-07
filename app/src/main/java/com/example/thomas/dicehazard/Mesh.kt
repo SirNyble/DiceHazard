@@ -112,36 +112,55 @@ class Mesh {
 
   }
 
-  fun updateGLBuffers() {
+  fun update() {
+    //First we need to update the number of vertices
+    updateVertexCount()
 
-    var numVertices: Int = 0
+    //Now that we have the vertex count we can fill the triangle float array
+    updateTriangleCoords()
+
+    //Update GL Buffers with the updated triangl float array
+    updateGLBuffers()
+  }
+
+  private fun updateVertexCount() {
+    //Right now make assumption triangle has position/normal/texture so every third element is
+    //position data
+    vertexCount = 0
     for (i in 0 until triangleBuffers.size) {
-      numVertices += triangleBuffers[i].size / 3
+      vertexCount += triangleBuffers[i].size / 3
     }
-    triangleCoords = FloatArray(numVertices * 3)
 
-    var count = 0
+  }
+
+  private fun updateTriangleCoords() {
+    //Each triangle has X,Y,Z so multiply the number of position vertices by 3
+    triangleCoords = FloatArray(vertexCount * 3)
+
+    //triangleBuffers contains the INDEX of the position in the floatbuffer buffers var
+    //each triangle has 3 elements (XYZ), Normal, Texture so we step by 3 to only get XYZ for now
+    //TODO: Get and fill the Normal and Texture
+    var buffer: FloatArray = buffers[positionSourceID]!!
+    var currentTriangle = 0
     for (i in 0 until triangleBuffers.size) {
       for (j in 0 until triangleBuffers[i].size step 3) {
-        var buffer: FloatArray = buffers[positionSourceID]!!
+        //We have to multiply the index in triangleBuffers by 3 because each element is XYZ data
         val vertIndex = triangleBuffers[i][j] * 3
-        var triangleCoord: Float = buffer[vertIndex]
-        triangleCoords!![count * 3] = triangleCoord
-        triangleCoords!![count * 3 + 1] = buffer[vertIndex + 1]
-        triangleCoords!![count * 3 + 2] = buffer[vertIndex + 2]
-        count++
+
+        //Set the XYZ data now that we have the base float element which is the X Val.
+        //To get Y and Z elements we just add by offset
+        triangleCoords!![currentTriangle * 3] = buffer[vertIndex]
+        triangleCoords!![currentTriangle * 3 + 1] = buffer[vertIndex + 1]
+        triangleCoords!![currentTriangle * 3 + 2] = buffer[vertIndex + 2]
+        currentTriangle++
       }
     }
+  }
 
-    val rhys = true
-
-    vertexCount = numVertices /// COORDS_PER_VERTEX
-
-    //TODO: use appropriate opengl calls to fill the buffers
-    // initialize vertex byte buffer for shape coordinates
+  private fun updateGLBuffers() {
     val bb = ByteBuffer.allocateDirect(
         // (number of coordinate values * 4 bytes per float)
-        numVertices * 3 * 4)
+        vertexCount * 3 * 4)
     // use the device hardware's native byte order
     bb.order(ByteOrder.nativeOrder())
 
@@ -209,7 +228,7 @@ class Mesh {
     GLES20.glDisableVertexAttribArray(mPositionHandle)
   }
 
-  fun getFloatArrayFromString(floatArrString: String, count: Int): FloatArray {
+  private fun getFloatArrayFromString(floatArrString: String, count: Int): FloatArray {
     var floatArr: FloatArray = FloatArray(count)
 
     var tokenizedStr = floatArrString.split(" ")
@@ -225,7 +244,7 @@ class Mesh {
     return floatArr
   }
 
-  fun getIntArrayFromString(bufferString: String, count: Int): IntArray {
+  private fun getIntArrayFromString(bufferString: String, count: Int): IntArray {
     val trianglesToElements: Int = count * buffers.count() * 3
     var intArray = IntArray(trianglesToElements)
 

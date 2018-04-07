@@ -42,9 +42,9 @@ class Triangle {
   private val COORDS_PER_VERTEX: Int = 3
   private val triangleCoords: FloatArray = floatArrayOf(
       // in counterclockwise order:
-      1.235668f, 0.496339f, 0.455921f,
-      1.455921f, 3.04533f, 0.235668f,
-      1.424213f, 0.506279f, 0.455921f
+      0f, 1f, -1f,
+      -5f, 0f, 0f,
+      5f,0f, 0f
 //      0.0f, 0.622008459f, 0.0f, // top
 //      -0.5f, -0.311004243f, 0.0f, // bottom left
 //      0.5f, -0.311004243f, 0.0f  // bottom right

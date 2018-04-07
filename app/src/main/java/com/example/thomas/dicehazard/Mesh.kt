@@ -1,6 +1,7 @@
 package com.example.thomas.dicehazard
 
 import android.opengl.GLES20
+import android.opengl.Matrix
 import android.util.Log
 import org.w3c.dom.Element
 import org.w3c.dom.Node
@@ -18,12 +19,13 @@ class Mesh {
       // This matrix member variable provides a hook to manipulate
       // the coordinates of the objects that use this vertex shader
       "uniform mat4 uMVPMatrix;" +
+          "uniform mat4 uModelMatrix;" +
           "attribute vec4 vPosition;" +
           "void main() {" +
           // the matrix must be included as a modifier of gl_Position
           // Note that the uMVPMatrix factor *must be first* in order
           // for the matrix multiplication product to be correct.
-          "  gl_Position = uMVPMatrix * vPosition;" +
+          "  gl_Position =  uMVPMatrix * uModelMatrix *  vPosition;" +
           "}")
 
   //Fragment Shader
@@ -51,7 +53,10 @@ class Mesh {
   private var vertexStride = COORDS_PER_VERTEX * 4 // 4 bytes per vertex
 
   //Color
-  private val color: FloatArray = floatArrayOf(1f,1f, 1f, 1.0f)
+  private val color: FloatArray = floatArrayOf(1f, 1f, 1f, 1.0f)
+
+  private var mModelMatrixHandle: Int = -1
+  private val mModelMatrix: FloatArray = FloatArray(16)
 
 
   var triangleCoords: FloatArray? = null
@@ -98,8 +103,8 @@ class Mesh {
   }
 
   fun setPositionSourceID(sourceElement: Element) {
-    val inputElementList= sourceElement.getElementsByTagName("input")
-    if(inputElementList.length == 1) {
+    val inputElementList = sourceElement.getElementsByTagName("input")
+    if (inputElementList.length == 1) {
       val inputElement = inputElementList.item(0) as Element
       this.positionSourceID = inputElement.getAttribute("source").removeRange(startIndex = 0, endIndex = 1)
       this.positionSourceID += "-array"
@@ -120,10 +125,10 @@ class Mesh {
       for (j in 0 until triangleBuffers[i].size step 3) {
         var buffer: FloatArray = buffers[positionSourceID]!!
         val vertIndex = triangleBuffers[i][j] * 3
-        var triangleCoord: Float = buffer[ vertIndex ]
+        var triangleCoord: Float = buffer[vertIndex]
         triangleCoords!![count * 3] = triangleCoord
-        triangleCoords!![count * 3 + 1] =  buffer[ vertIndex + 1 ]
-        triangleCoords!![count * 3  +2] = buffer[vertIndex + 2]
+        triangleCoords!![count * 3 + 1] = buffer[vertIndex + 1]
+        triangleCoords!![count * 3 + 2] = buffer[vertIndex + 2]
         count++
       }
     }
@@ -134,35 +139,35 @@ class Mesh {
 
     //TODO: use appropriate opengl calls to fill the buffers
     // initialize vertex byte buffer for shape coordinates
-        val bb = ByteBuffer.allocateDirect(
-                // (number of coordinate values * 4 bytes per float)
-                numVertices * 3 * 4)
-        // use the device hardware's native byte order
-        bb.order(ByteOrder.nativeOrder())
+    val bb = ByteBuffer.allocateDirect(
+        // (number of coordinate values * 4 bytes per float)
+        numVertices * 3 * 4)
+    // use the device hardware's native byte order
+    bb.order(ByteOrder.nativeOrder())
 
-        // create a floating point buffer from the ByteBuffer
-        vertexBuffer = bb.asFloatBuffer()
-        // add the coordinates to the FloatBuffer
-        vertexBuffer?.put(triangleCoords!!)
-        // set the buffer to read the first coordinate
-        vertexBuffer?.position(0)
+    // create a floating point buffer from the ByteBuffer
+    vertexBuffer = bb.asFloatBuffer()
+    // add the coordinates to the FloatBuffer
+    vertexBuffer?.put(triangleCoords!!)
+    // set the buffer to read the first coordinate
+    vertexBuffer?.position(0)
 
-        val vertexShader = MyGLRenderer.loadShader(GLES20.GL_VERTEX_SHADER,
-                vertexShaderCode)
-        val fragmentShader = MyGLRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER,
-                fragmentShaderCode)
+    val vertexShader = MyGLRenderer.loadShader(GLES20.GL_VERTEX_SHADER,
+        vertexShaderCode)
+    val fragmentShader = MyGLRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER,
+        fragmentShaderCode)
 
-        // create empty OpenGL ES Program
-        mProgram = GLES20.glCreateProgram()
+    // create empty OpenGL ES Program
+    mProgram = GLES20.glCreateProgram()
 
-        // add the vertex shader to program
-        GLES20.glAttachShader(mProgram, vertexShader)
+    // add the vertex shader to program
+    GLES20.glAttachShader(mProgram, vertexShader)
 
-        // add the fragment shader to program
-        GLES20.glAttachShader(mProgram, fragmentShader)
+    // add the fragment shader to program
+    GLES20.glAttachShader(mProgram, fragmentShader)
 
-        // creates OpenGL ES program executables
-        GLES20.glLinkProgram(mProgram)
+    // creates OpenGL ES program executables
+    GLES20.glLinkProgram(mProgram)
   }
 
   fun draw(mvpMatrix: FloatArray) {
@@ -192,6 +197,11 @@ class Mesh {
     // Pass the projection and view transformation to the shader
     GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0)
 
+    mModelMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uModelMatrix")
+    Matrix.setIdentityM(mModelMatrix, 0)
+    Matrix.rotateM(mModelMatrix, 0, -90f, 1f, 0f, 0f)
+    GLES20.glUniformMatrix4fv(mModelMatrixHandle, 1, false, mModelMatrix, 0)
+
     // Draw the triangle
     GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount)
 
@@ -204,12 +214,11 @@ class Mesh {
 
     var tokenizedStr = floatArrString.split(" ")
     val strCount = tokenizedStr.count()
-    if(strCount.equals(count)) {
+    if (strCount.equals(count)) {
       for (i in 0 until count) {
         floatArr[i] = tokenizedStr[i].toFloat()
       }
-    }
-    else {
+    } else {
       Log.d("ERROR", "Collada float array count does not match the count id value!")
       //TODO: THROW ERROR, not sure how in kotlin yet ¯\_(ツ)_/¯
     }
@@ -223,12 +232,11 @@ class Mesh {
     var tokenizedStr = bufferString.split(" ")
     val strCount = tokenizedStr.count()
 
-    if(strCount.equals(trianglesToElements)) {
+    if (strCount.equals(trianglesToElements)) {
       for (i in 0 until strCount) {
         intArray[i] = tokenizedStr[i].toInt()
       }
-    }
-    else {
+    } else {
       Log.d("ERROR", "Collada int array count does not match the count id value!")
       //TODO: THROW ERROR, not sure how in kotlin yet ¯\_(ツ)_/¯
     }
